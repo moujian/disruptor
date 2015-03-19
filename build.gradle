@@ -24,7 +24,7 @@ apply plugin: 'idea'
 defaultTasks 'build'
 
 group = 'com.lmax'
-version = new Version(major: 3, minor: 3, revision: 0)
+version = new Version(major: 3, minor: 3, revision: 2)
 
 ext {
     fullName = 'Disruptor Framework'
@@ -82,7 +82,7 @@ compilePerfJava {
 }
 
 javadoc {
-    title = '<h1>Disruptor</h1>'
+    title = 'Disruptor'
 
     options.addStringOption('XDignore.symbol.file', '-quiet')
     options.author = true
@@ -168,9 +168,11 @@ task listJars << {
     configurations.perfCompile.each { file -> println file.name }
 }
 
-task tempLibs(type: Sync) {
-    from configurations.perfCompile
-    into('templib')
+task perfJar(type: Jar) {
+    baseName = project.name + '-perf'
+    from { configurations.perfCompile.collect { it.isDirectory() ? it : zipTree(it) } }
+    from sourceSets.perf.output 
+    with jar
 }
 
 task wrapper(type: Wrapper) {
